@@ -87,7 +87,7 @@ export default function Home() {
       <div className="mx-auto w-[95vw] h-[85vh] text-white overflow-y-scroll">
         {Chat.map(item => {
           return <div key={item.id} className="w-full my-2">
-            <div className={`my-3 py-2 px-4 flex flex-col ${item.from == "user" ? "bg-slate-800 rounded-4xl relative left-1 w-fit" : "w-[99%]"}`}>
+            <div className={`my-3 py-2 px-4 flex flex-col ${item.from == "user" ? "bg-red-800 rounded-4xl relative left-1 w-fit" : "w-[99%]"}`}>
               <pre className={`w-full 
                 ${item.from == "AI" ? "overflow-x-scroll" : ""}`}>{item.content}</pre>
             </div>
