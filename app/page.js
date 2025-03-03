@@ -8,7 +8,7 @@ export default function Home() {
   const [Loading, setLoading] = useState(false)
   const [Chat, SetChat] = useState([])
 
-  const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMENI_API_KEY);
+  const genAI = new GoogleGenerativeAI(process.env.GEMENI_API_KEY);
   const model = genAI.getGenerativeModel({
     model: "gemini-2.0-flash",
     systemInstruction: "You are an AI assistant developed by Team Tech Shock to help people extract text from image , pdf or etc files and search to make their task easy ",
