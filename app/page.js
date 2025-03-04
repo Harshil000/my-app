@@ -1,12 +1,22 @@
 'use client'
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import { v4 as uuidv4 } from 'uuid';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 export default function Home() {
+
+  const [Chat, SetChat] = useState([])
+
+  useEffect(() => {
+    if (localStorage.getItem('storedChat') == null) {
+      SetChat([])
+    } else {
+      const data = localStorage.getItem('storedChat');
+      SetChat(JSON.parse(data))
+    }
+  }, [])
 
   const [userInput, setuserInput] = useState("")
   const [Loading, setLoading] = useState(false)
-  const [Chat, SetChat] = useState([])
 
   const genAI = new GoogleGenerativeAI("AIzaSyALFwQ3discr7RwslxPhqEmLMatniBWVU8");
   const model = genAI.getGenerativeModel({
@@ -22,15 +32,47 @@ export default function Home() {
 
   const handleSendMessage = async () => {
     let tempchat = Chat
-    tempchat.push({ "from": "user", "content": userInput, "id": uuidv4() })
+    tempchat.push({ "from": "user", "content": userInput, "id": uuidv4(), "tag": "div" })
     SetChat(tempchat)
     setLoading(true)
     const result = await model.generateContent(userInput);
     setuserInput("")
+    let checkStar = new Promise((resolve, reject) => {
+      for (let i of result.response.text()) {
+        if (i == "*") {
+          resolve(true)
+        }
+      }
+      resolve(false)
+    })
+    checkStar.then(e => {
+      console.log(e)
+      tempchat = Chat
+      if (e) {
+        tempchat.push({ "from": "AI", "content": result.response.text().replaceAll("*", ""), "id": uuidv4(), "tag": "pre" })
+        SetChat(tempchat)
+        localStorage.setItem('storedChat', JSON.stringify(Chat));
+      } else {
+        tempchat.push({ "from": "AI", "content": result.response.text(), "id": uuidv4(), "tag": "div" })
+        SetChat(tempchat)
+        localStorage.setItem('storedChat', JSON.stringify(Chat));
+      }
+    })
     setLoading(false)
-    tempchat = Chat
-    tempchat.push({ "from": "AI", "content": result.response.text().replaceAll("*" , ""), "id": uuidv4() })
-    SetChat(tempchat)
+  }
+
+  const HandleDelete = (e) => {
+    let concent = confirm("Do you reeally want to delete that part of the conversation ?")
+    if (concent) {
+      const tempChat = Chat
+      console.log(tempChat)
+      let newChat = tempChat.filter((item) => item.id != e.target.getAttribute('data-id'))
+      console.log(newChat)
+      newChat = newChat.filter((item) => item.id != e.target.parentNode.nextElementSibling.firstChild.firstChild.getAttribute('data-id'))
+      console.log(newChat)
+      SetChat(newChat)
+      localStorage.setItem('storedChat', JSON.stringify(newChat));
+    }
   }
 
   return (
@@ -87,9 +129,16 @@ export default function Home() {
       <div className="mx-auto w-[95vw] h-[85vh] text-white overflow-y-scroll">
         {Chat.map(item => {
           return <div key={item.id} className="w-full my-2">
+            {item.from == "user" && <div data-id={item.id} className="left-1 px-3 text-red-600 w-fit rounded-2xl text-sm hover:underline cursor-pointer" onClick={HandleDelete}>Delete</div>}
             <div className={`my-3 py-2 px-4 flex flex-col ${item.from == "user" ? "bg-slate-800 rounded-4xl relative left-1 w-fit" : "w-[99%]"}`}>
-              <pre className={`w-full 
-                ${item.from == "AI" ? "overflow-x-scroll" : ""}`}>{item.content}</pre>
+              {item.tag == "pre" ?
+                <pre data-id={item.id} className={`w-full ${item.from == "AI" ? "overflow-x-scroll" : ""}`}>
+                  {item.content}
+                </pre> :
+                <div data-id={item.id} className={`w-full ${item.from == "AI" ? "overflow-x-scroll" : ""}`}>
+                  {item.content}
+                </div>
+              }
             </div>
           </div>
         })}
