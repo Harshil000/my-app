@@ -135,7 +135,7 @@ export default function Home() {
                 <pre data-id={item.id} className={`w-full ${item.from == "AI" ? "overflow-x-scroll" : ""}`}>
                   {item.content}
                 </pre> :
-                <div data-id={item.id} className={`w-full ${item.from == "AI" ? "overflow-x-scroll" : ""}`}>
+                <div data-id={item.id} className="w-full">
                   {item.content}
                 </div>
               }
