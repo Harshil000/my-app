@@ -65,11 +65,8 @@ export default function Home() {
     let concent = confirm("Do you reeally want to delete that part of the conversation ?")
     if (concent) {
       const tempChat = Chat
-      console.log(tempChat)
       let newChat = tempChat.filter((item) => item.id != e.target.getAttribute('data-id'))
-      console.log(newChat)
       newChat = newChat.filter((item) => item.id != e.target.parentNode.nextElementSibling.firstChild.firstChild.getAttribute('data-id'))
-      console.log(newChat)
       SetChat(newChat)
       localStorage.setItem('storedChat', JSON.stringify(newChat));
     }
