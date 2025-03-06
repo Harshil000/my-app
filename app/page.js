@@ -46,7 +46,6 @@ export default function Home() {
       resolve(false)
     })
     checkStar.then(e => {
-      console.log(e)
       tempchat = Chat
       if (e) {
         tempchat.push({ "from": "AI", "content": result.response.text().replaceAll("*", ""), "id": uuidv4(), "tag": "pre" })
